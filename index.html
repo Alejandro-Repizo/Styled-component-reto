@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Components - Reto</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background-color: #d5e4ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script>
+
+        /**
+         * Tagged template, se encarga de recibir los
+         * los values y los string, luego coloca
+         * el value en medio de los strings
+         * para asemejar la estructura de HTML
+         * */
+        function component(strings, ...dynamicValues) {
+            return function (props) {
+                /**
+                 * Devuelve una copia de una parte del 
+                 * array dentro de un nuevo array
+                 * */
+                let newContent = strings.slice()
+
+                dynamicValues.forEach((value, index) => {
+                    /**
+                     * Concatenamos el valor que viene 
+                     * props con el primer valor de 
+                     * newContent
+                     * */
+                    newContent[index] += props[value]
+
+                })
+
+                /**
+                 * Con join('') lo que hacemos es 
+                 * convertir el array a un string plano
+                 * */
+                return newContent.join('')
+            }
+
+        }
+
+        /**
+         * Lista de etiquetas
+        */
+        const tags = ['h1', 'h2', 'span', 'small', 'div', 'p']
+
+        /**
+         * Se encarga de almacenar
+         * los tipos de estructuras HTML
+         * y como se van a ejecutar estas
+        */
+        function createStyled(tags) {
+
+            let styled = {}
+
+            tags.forEach((tag) => {
+                styled[tag] = function (styles) {
+                    return function (content) {
+                        return `
+                            <${tag} style="${styles}"> ${content} <${tag}/>
+                        `
+                    }
+                }
+            })
+            return styled
+        }
+
+        /**
+         * Styled component recibe los estilos
+         * y el tipo de estructura HTML que va 
+         * a encerrar nuestro componente
+         * */
+
+        const style = createStyled(tags)
+
+
+        const TitleStyled = style.div`
+                color: orange;
+                font-family: system-ui;
+                font-size: 50px;
+                text-shadow: 1px 1px rgba(8, 8, 8, 0.507);
+               
+            `
+
+        const SocialStyled = style.p`
+            font-family: system-ui;
+            color: gray;
+            font-size: 18px;
+            margin: 0 0 16px;
+            text-align: center;
+        `
+
+        /**
+         * Son los valores que van a ir
+         * en nuestros componentes
+         * */
+        const props = {
+            message: 'El trabajo duro supera al talento natural',
+            name: 'Alejandro',
+            social: 'Alejandro-Repizo'
+        }
+
+        /**
+         * Pasamos un template literals, que es 
+         * la estrucuta de nuestro componente
+         * y luego dentro de parentesis
+         * el valor que va ir dentro de la estructura
+         * */
+        const Title = component`<h6> ${'message'} </h6>`(props)
+
+        const Social = component`<a href="https://github.com/Alejandro-Repizo/" target="__blank">${'social'}</a>`(props)
+
+
+        /**
+         * Recibe un componente y el contenedor
+         * donde va a ir este, luego convierte
+         * ese component a HTML y lo 
+         * agrega al container
+        */
+        function render(component, container) {
+            container.innerHTML += component
+        }
+
+        /**
+         * Cuando hay un elemento con un id en el DOM,
+         * este se almacena o se crea dentro de la 
+         * clase window.
+         * */
+
+        render(TitleStyled(Title), window.container)
+
+        render(SocialStyled(Social), window.container)
+
+    </script>
+</body>
+
+</html>
